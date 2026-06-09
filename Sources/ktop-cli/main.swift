@@ -56,8 +56,8 @@ for i in 1...3 {
         tp.cpuCelsius, tp.cpuMaxCelsius, tp.batteryCelsius, t.pressure.rawValue, fans
     )
     let bwLine = String(
-        format: "| BW cpu %.0f gpu %.0f other %.0f total %.0f GB/s",
-        bw.cpuGBs, bw.gpuGBs, bw.otherGBs, bw.totalGBs
+        format: "| BW cpu %.0f gpu %.0f media %.0f other %.0f total %.0f GB/s",
+        bw.cpuGBs, bw.gpuGBs, bw.mediaGBs, bw.otherGBs, bw.totalGBs
     )
     print("#\(i)  \(cpuLine)  \(pwrLine)  \(memLine)  \(bwLine)  \(thermLine)")
 }

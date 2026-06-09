@@ -1,14 +1,17 @@
 //
 //  File:      BandwidthSampler.swift
 //  Created:   2026-06-08
-//  Updated:   2026-06-08
+//  Updated:   2026-06-09
 //  Developer: Kennt Kim / Calida Lab
 //  Overview:  Reads unified-memory bandwidth (GB/s) sudolessly via IOReport
 //             "AMC Stats". Subscribes once; each sample() diffs two snapshots and
 //             converts accumulated bytes to GB/s.
 //  Notes:     Channels live in subgroup "Perf Counters" named "<unit> DCS RD/WR"
-//             (Simple format, bytes). GB/s = (bytes / seconds) / 1e9. Requestors:
-//             ECPU/PCPU* -> CPU, GFX -> GPU, everything else -> other.
+//             (Simple format, bytes). GB/s = (bytes / seconds) / 1e9. Requestor map:
+//             ECPU/PCPU* -> CPU, GFX -> GPU, ISP/VENC/VDEC/PRORES/CODEC/JPEG -> Media,
+//             "DCS" is the chip-wide aggregate (= total); other = total - the above.
+//             MSR is intentionally NOT media (matches NeoAsitop). Requestor list
+//             adapted from NeoAsitop (op06072/NeoAsitop), MIT License.
 //
 import Foundation
 import CIOReport
@@ -46,7 +49,7 @@ public final class BandwidthSampler {
         }
 
         let seconds = max(interval, 0.001)
-        var cpu = 0.0, gpu = 0.0, media = 0.0, other = 0.0
+        var cpu = 0.0, gpu = 0.0, media = 0.0, total = 0.0
 
         IOReportIterate(delta) { channel in
             guard IOReportChannelGetFormat(channel) == kKtopIOReportFormatSimple,
@@ -58,20 +61,28 @@ public final class BandwidthSampler {
             }
 
             let name = (nameRef as String).uppercased()
-            guard name.contains("DCS") else { return Int32(kKtopIOReportIterOk) }
-
-            let bytes = Double(IOReportSimpleGetIntegerValue(channel, 0))
-            let gbs = (bytes / seconds) / 1_000_000_000.0
-
-            if name.hasPrefix("ECPU") || name.hasPrefix("PCPU") {
-                cpu += gbs
-            } else if name.hasPrefix("GFX") {
-                gpu += gbs
-            } else if name.contains("PRORES") || name.contains("CODEC") {
-                media += gbs          // Media Engine: video encode/decode, ProRes
-            } else {
-                other += gbs
+            // Only DCS read/write byte counters (skip CAS/RAS/cycle/entry counters).
+            guard name.hasSuffix(" RD") || name.hasSuffix(" WR"), name.contains("DCS") else {
+                return Int32(kKtopIOReportIterOk)
             }
+            let requestor = String(name.dropLast(3))   // strip " RD" / " WR"
+            let gbs = (Double(IOReportSimpleGetIntegerValue(channel, 0)) / seconds) / 1_000_000_000.0
+
+            if requestor == "DCS" {
+                total += gbs                                  // chip-wide aggregate = true total
+            } else if requestor.hasPrefix("ECPU") || requestor.hasPrefix("PCPU") {
+                cpu += gbs
+            } else if requestor.hasPrefix("GFX") {
+                gpu += gbs
+            } else if requestor.hasPrefix("VENC") || requestor.hasPrefix("VDEC")
+                   || requestor.hasPrefix("ISP") || requestor.hasPrefix("JPG")
+                   || requestor.hasPrefix("JPEG") || requestor.contains("PRORES")
+                   || requestor.contains("CODEC") {
+                // Media Engine = isp + strm codec + prores + vdec + venc + jpeg + jpg
+                // (matches NeoAsitop's requestor list). MSR is NOT media -> falls into "other".
+                media += gbs
+            }
+            // remaining requestors (MSR / DISP / ANS / PCIe …) are folded into "other" below
             return Int32(kKtopIOReportIterOk)
         }
 
@@ -79,7 +90,8 @@ public final class BandwidthSampler {
         result.cpuGBs = cpu
         result.gpuGBs = gpu
         result.mediaGBs = media
-        result.otherGBs = other
+        // "DCS" is the authoritative chip total; derive other so the parts sum to it.
+        result.otherGBs = total > 0 ? max(0, total - cpu - gpu - media) : 0
         return result
     }
 }
