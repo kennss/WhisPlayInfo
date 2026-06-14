@@ -277,30 +277,28 @@ private struct AIRuntimeCard: View {
 
     // ③ model line: authoritative loaded-model info + tokens/sec, or a status hint.
     @ViewBuilder private var modelLine: some View {
-        switch api.status {
-        case .ok:
-            if let m = api.primaryModel {
-                HStack(spacing: 6) {
-                    Image(systemName: "cube.fill").font(.system(size: 9.5)).foregroundStyle(Theme.accent)
-                    Text(m.name).font(.system(size: 11, weight: .medium, design: .monospaced))
-                        .foregroundStyle(Theme.text).lineLimit(1).truncationMode(.middle)
-                    Text(modelDetail(m)).font(.system(size: 10, design: .monospaced)).foregroundStyle(Theme.dim)
-                    if let tps = api.tokensPerSec {
-                        Text(String(format: "· %.0f tok/s", tps))
-                            .font(.system(size: 10, weight: .medium, design: .monospaced))
-                            .foregroundStyle(Theme.heat(0.4))
-                    }
-                    Spacer(minLength: 0)
+        if api.status == .ok, let m = api.primaryModel {
+            HStack(spacing: 6) {
+                Image(systemName: "cube.fill").font(.system(size: 9.5)).foregroundStyle(Theme.accent)
+                Text(m.name).font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .foregroundStyle(Theme.text).lineLimit(1).truncationMode(.middle)
+                Text(modelDetail(m)).font(.system(size: 10, design: .monospaced)).foregroundStyle(Theme.dim)
+                if let tps = api.tokensPerSec {
+                    Text(String(format: "· %.0f tok/s", tps))
+                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .foregroundStyle(Theme.heat(0.4))
                 }
-            } else {
-                runtimeNote("runtime running — no model loaded")
+                Spacer(minLength: 0)
             }
-        case .runningNoServer: runtimeNote("runtime running — start its local server for model + tok/s")
-        case .apiNotApplicable: runtimeNote("CLI runtime — no local API")
-        case .unreachable:      runtimeNote("runtime API unreachable")
-        case .disabled:
-            if runtime.isActive {
-                runtimeNote("Enable “Connect to local AI runtimes” in Settings for model + tok/s")
+        } else if runtime.isActive {
+            // Only annotate API status when a runtime was actually detected — with none,
+            // the header already says "No local AI runtime detected" (avoid redundancy).
+            switch api.status {
+            case .ok:               runtimeNote("runtime running — no model loaded")
+            case .runningNoServer:  runtimeNote("runtime running — start its local server for model + tok/s")
+            case .apiNotApplicable: runtimeNote("CLI runtime — no local API")
+            case .unreachable:      runtimeNote("runtime API unreachable")
+            case .disabled:         runtimeNote("Enable “Connect to local AI runtimes” in Settings for model + tok/s")
             }
         }
     }

@@ -14,6 +14,12 @@ Apple Silicon accelerators — hence the focus on ANE / Media / bandwidth.
 
 ![SiliconScope dashboard](docs/img/screenshot.png)
 
+*Live local LLM (LM Studio): detected runtime, loaded model, GPU/CPU offload split, and the memory budget.*
+
+![SiliconScope catching memory pressure](docs/img/screenshot-2.png)
+
+*A 31B model overflowing unified memory — the budget flips to `swapping` and the memory-pressure banner fires before tokens/sec collapse.*
+
 ## Install
 
 **[⬇ Download the latest DMG](https://github.com/kennss/SiliconScope/releases/latest)**, then:
