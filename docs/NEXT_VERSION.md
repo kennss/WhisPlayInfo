@@ -4,7 +4,7 @@ v1.0.0 is a general Apple Silicon monitor. The next version specializes toward
 **AI-inference monitoring** on Apple Silicon — the niche neither terminal monitors
 nor Activity Monitor cover.
 
-## Shipped (post-v1.0.2, on `main`)
+## Shipped (v1.1.0 – v1.3.0)
 
 - **AI Workload view (hero)** — a bottleneck classifier with a single verdict:
   *bandwidth-bound* / *compute-bound* / *thermal-throttled* / *memory-pressured*
@@ -24,19 +24,52 @@ nor Activity Monitor cover.
   `size_vram/size`), and tokens/sec (llama.cpp `/metrics`) from `127.0.0.1`. Off by default.
   Design: [`ai-local-features-design.md`](ai-local-features-design.md).
 
-## Planned
+## v1.4 roadmap — from "AI monitor" to "local-AI operations"
 
-- **Engine attribution** — GPU/Metal vs ANE, as a clear hint
-- **Ollama tokens/sec without active inference** — embedded `llama-server` `/metrics` at the
-  dynamic argv port, or opt-in passive log-tail
-- **WhisPlay process detect / pin**
-- **Packaging** — Homebrew cask
+The metric local-LLM users live by is **tokens/sec**, and it's the biggest remaining
+gap (we only get it from llama.cpp today). Build there first, then layer per-machine
+learning and RAM hygiene on top — that's what turns a gauge into an operations tool.
+Each tier is roughly ordered smallest-valuable-first; the validation here came from real
+M1 Max runs (MoE 26B, dense 12B/31B) earlier in development.
+
+### Tier 1 — speed (build first)
+
+- **tokens/sec for every runtime, with history.** Ollama is feasible *now*: read the
+  embedded `llama-server` `/metrics` (`predicted_tokens_seconds`) at the **dynamic argv
+  port we already parse** (`AIRuntimeSample.ollamaEmbeddedPort`). llama.cpp is already
+  done; LM Studio exposes no passive rate (note it in-UI). Add a tok/s sparkline.
+- **tokens-per-watt (efficiency).** tok/s ÷ package power — Apple Silicon's signature
+  metric, near-absent in other tools. Combines the runtime API with the chip power we
+  already sample.
+
+### Tier 2 — make it a tool, not just a gauge
+
+- **Per-model performance log.** Record tok/s, peak temp, and power per model+quant over
+  time → "what's fast on *my* Mac" (e.g. gemma-12b Q4 ≈ 38 tok/s, qwen-32b Q4 ≈ 12 tok/s).
+  Builds directly on Tier 1.
+- **Idle-model reclaim nudge.** A model loaded but unused for N minutes while holding
+  X GB → suggest unloading. Sudoless — we already detect the loaded model (③) and activity.
+
+### Tier 3 — nice to have
+
+- **Model recommender** — beyond "largest that fits": concrete model/quant suggestions for
+  the detected chip + free memory.
+- **Context / KV-cache cost** — show how much memory the KV cache adds at 8k / 32k / 128k
+  context; warn when a long context eats the budget.
+- **AI menu-bar mode** — one line: current model · tok/s · GPU · headroom.
+- **"AI app" pin (Settings)** — a user-pinned process name to surface in-app MLX/CoreML
+  apps (e.g. WhisPlay via MLX-Swift) that have **no runtime process**. This is the only
+  way around the in-app-inference blind spot (see below).
+- **Engine attribution** (GPU/Metal vs ANE hint) · **Homebrew cask**.
 
 ## Out of scope (sudoless limits)
 
-- Per-process GPU / ANE attribution (not reliably available without elevated access)
-- tokens/sec from chip telemetry alone — now obtained from the runtimes' own HTTP APIs
-  (opt-in), not the SoC counters
+- **Per-process GPU / ANE attribution** — not reliably available without elevated access.
+- **Auto-detecting in-app MLX/CoreML inference** — an app embedding MLX-Swift/CoreML has no
+  separate runtime process, so it can't be attributed automatically. Surfaced only via the
+  manual "AI app" pin (Tier 3). The tool stays honest meanwhile ("GPU active — type unknown").
+- **tokens/sec from chip telemetry alone** — obtained instead from the runtimes' own HTTP
+  APIs / metrics (opt-in), never fabricated from SoC counters.
 
 ## Compatibility notes / lessons learned
 
