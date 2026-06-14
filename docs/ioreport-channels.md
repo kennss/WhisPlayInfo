@@ -1,6 +1,6 @@
 # Verified IOReport channel map (M1 Max, macOS 26.5)
 
-> The real, measured locations of the channels WhisPlayInfo reads. These can differ per
+> The real, measured locations of the channels SiliconScope reads. These can differ per
 > chip — re-verify on other models. IOReport links via `-undefined dynamic_lookup`
 > (symbols resolved at runtime from the dyld shared cache). Everything here is sudoless.
 

@@ -1,5 +1,22 @@
 # Changelog
 
+## v1.1.0 — 2026-06-14
+
+Renamed **WhisPlayInfo → SiliconScope**.
+
+The project outgrew its origin as a companion utility; the name now reflects what
+it is — a general Apple Silicon / SoC inspector. No functional changes to the
+metrics in this release.
+
+- App / product name: **SiliconScope** (was WhisPlayInfo)
+- Bundle identifier: `ai.calidalab.SiliconScope` (was `ai.calidalab.WhisPlayInfo`)
+- SwiftPM targets: `SiliconScope` (app), `SiliconScopeCore` (data library),
+  `sscope-cli` (verification CLI)
+- Repository: `github.com/kennss/SiliconScope` (the old URL redirects)
+
+> Because the bundle identifier changed, this installs alongside any existing
+> WhisPlayInfo rather than upgrading it in place — delete the old app if you have it.
+
 ## v1.0.2 — 2026-06-09
 
 Crash fix: launch failure on macOS 27.

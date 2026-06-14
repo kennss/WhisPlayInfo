@@ -1,12 +1,12 @@
 //
 //  File:      SettingsView.swift
 //  Created:   2026-06-08
-//  Updated:   2026-06-08
+//  Updated:   2026-06-14
 //  Developer: Kennt Kim / Calida Lab
 //  Overview:  Preferences window (Cmd+,). Refresh cadence and temperature unit,
 //             persisted in UserDefaults via @AppStorage.
 //  Notes:     Keys: "refreshInterval" (seconds), "temperatureFahrenheit" (Bool).
-//             KtopMonitor reads refreshInterval each loop; temperature views read the
+//             SiliconScopeMonitor reads refreshInterval each loop; temperature views read the
 //             unit. Both update live without restart.
 //
 import SwiftUI

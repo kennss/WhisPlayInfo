@@ -1,7 +1,7 @@
 //
 //  File:      DashboardView.swift
 //  Created:   2026-06-08
-//  Updated:   2026-06-08
+//  Updated:   2026-06-14
 //  Developer: Kennt Kim / Calida Lab
 //  Overview:  Full-window dashboard. Header (chip, cores, SoC power, battery), then
 //             CPU + GPU side by side, combined Memory|Bandwidth and Network|Disk cards
@@ -10,10 +10,10 @@
 //             in the Sensors card. Combined cards split left/right with a Divider.
 //
 import SwiftUI
-import KtopCore
+import SiliconScopeCore
 
 struct DashboardView: View {
-    let monitor: KtopMonitor
+    let monitor: SiliconScopeMonitor
 
     var body: some View {
         let snapshot = monitor.snapshot
@@ -73,7 +73,7 @@ private struct HeaderView: View {
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 10) {
-            Text("WhisPlayInfo").font(.system(size: 14, weight: .bold, design: .monospaced))
+            Text("SiliconScope").font(.system(size: 14, weight: .bold, design: .monospaced))
             if let t = topology {
                 Text(t.chipName).font(.system(size: 11, design: .monospaced)).foregroundStyle(Theme.dim)
                 Text("\(t.eCoreCount + t.pCoreCount) cores · \(t.eCoreCount)E+\(t.pCoreCount)P")

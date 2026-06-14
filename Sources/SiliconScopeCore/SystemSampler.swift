@@ -1,12 +1,12 @@
 //
 //  File:      SystemSampler.swift
 //  Created:   2026-06-08
-//  Updated:   2026-06-08
+//  Updated:   2026-06-14
 //  Developer: Kennt Kim / Calida Lab
-//  Overview:  Aggregates every KtopCore sampler into one SystemSnapshot. Intended to
-//             run on a single background thread driven by the UI's refresh loop.
+//  Overview:  Aggregates every SiliconScopeCore sampler into one SystemSnapshot. Intended
+//             to run on a single background thread driven by the UI's refresh loop.
 //  Notes:     @unchecked Sendable: the underlying samplers hold non-Sendable IOReport
-//             handles, but ktop only ever calls sample() from one serial background
+//             handles, but SiliconScope only ever calls sample() from one serial background
 //             task, so this is safe. Do not call sample() concurrently.
 //
 import Foundation

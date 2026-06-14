@@ -2,31 +2,33 @@
 #
 #  File:      package.sh
 #  Created:   2026-06-09
-#  Updated:   2026-06-09
+#  Updated:   2026-06-14
 #  Developer: Kennt Kim / Calida Lab
-#  Overview:  Builds release WhisPlayInfo.app, Developer ID–signs it (hardened runtime),
+#  Overview:  Builds release SiliconScope.app, Developer ID–signs it (hardened runtime),
 #             notarizes + staples it, then ships a notarized DMG with an /Applications
 #             drop link.
 #  Notes:     SPM emits no .app, so Contents/{MacOS,Resources} + Info.plist are assembled
-#             by hand; the SPM resource bundle is copied (needed by Bundle.module). The
-#             inner resource bundle is signed before the outer app. Requires a stored
-#             notarytool keychain profile. Usage: scripts/package.sh [version]
+#             by hand; the SPM resource bundle is copied alongside a top-level
+#             AppIcon.icns. Requires a stored notarytool keychain profile. The profile
+#             name (NOTARY_PROFILE) is a pre-existing local keychain credential kept
+#             as "WhisPlayInfo-notary" so notarization works without re-auth.
+#             Usage: scripts/package.sh [version]
 #
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 VERSION="${1:-1.0.0}"
-APP="WhisPlayInfo"
-BUNDLE_ID="ai.calidalab.WhisPlayInfo"
+APP="SiliconScope"
+BUNDLE_ID="ai.calidalab.SiliconScope"
 IDENTITY="Developer ID Application: YONG SOO KIM (8677QL77VJ)"
-NOTARY_PROFILE="WhisPlayInfo-notary"
+NOTARY_PROFILE="WhisPlayInfo-notary"   # pre-existing local keychain profile (kept to avoid re-auth)
 DIST="dist"
 APPDIR="$DIST/$APP.app"
 
 echo "▸ Building release binary…"
 xcrun swift build -c release --product "$APP"
 BIN=".build/release/$APP"
-RES_BUNDLE=".build/release/ktop_${APP}.bundle"
+RES_BUNDLE=".build/release/SiliconScope_${APP}.bundle"
 ICON="Sources/$APP/Resources/AppIcon.icns"
 
 echo "▸ Assembling $APP.app…"

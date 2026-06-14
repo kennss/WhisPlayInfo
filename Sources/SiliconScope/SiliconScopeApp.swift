@@ -1,11 +1,11 @@
 //
-//  File:      KtopApp.swift
+//  File:      SiliconScopeApp.swift
 //  Created:   2026-06-08
-//  Updated:   2026-06-09
+//  Updated:   2026-06-14
 //  Developer: Kennt Kim / Calida Lab
 //  Overview:  App entry point. Shows a full dashboard Window and a MenuBarExtra,
-//             both backed by one shared KtopMonitor.
-//  Notes:     Runs as an SPM executable (xcrun swift run WhisPlayInfo); activation
+//             both backed by one shared SiliconScopeMonitor.
+//  Notes:     Runs as an SPM executable (xcrun swift run SiliconScope); activation
 //             policy is set to .regular at runtime so the window + Dock icon appear
 //             without a bundled Info.plist. A proper .app bundle comes in packaging.
 //             Icon is loaded via loadAppIcon() — never SwiftPM's Bundle.module, whose
@@ -16,11 +16,11 @@ import SwiftUI
 import AppKit
 
 @main
-struct KtopApp: App {
-    @State private var monitor = KtopMonitor()
+struct SiliconScopeApp: App {
+    @State private var monitor = SiliconScopeMonitor()
 
     var body: some Scene {
-        Window("WhisPlayInfo", id: "ktop-main") {
+        Window("SiliconScope", id: "siliconscope-main") {
             DashboardView(monitor: monitor)
                 .frame(minWidth: 756, minHeight: 760)
                 .onAppear {
@@ -35,7 +35,7 @@ struct KtopApp: App {
         .windowResizability(.contentMinSize)
         .defaultSize(width: 864, height: 800)
 
-        MenuBarExtra("WhisPlayInfo", systemImage: "chart.bar.xaxis") {
+        MenuBarExtra("SiliconScope", systemImage: "chart.bar.xaxis") {
             MenuBarView(monitor: monitor)
                 .onAppear { monitor.start() }
         }
@@ -59,7 +59,7 @@ struct KtopApp: App {
         // Dev run (`swift run`): it lives inside the SwiftPM resource bundle next to
         // the executable. Resolve the path by hand so we never invoke Bundle.module.
         for base in [Bundle.main.resourceURL, Bundle.main.bundleURL].compactMap({ $0 }) {
-            let url = base.appendingPathComponent("ktop_WhisPlayInfo.bundle/AppIcon.icns")
+            let url = base.appendingPathComponent("SiliconScope_SiliconScope.bundle/AppIcon.icns")
             if let icon = NSImage(contentsOf: url) { return icon }
         }
         return nil

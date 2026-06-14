@@ -1,10 +1,10 @@
 //
 //  File:      PowerSample.swift
 //  Created:   2026-06-08
-//  Updated:   2026-06-08
+//  Updated:   2026-06-14
 //  Developer: Kennt Kim / Calida Lab
 //  Overview:  Value type holding one power reading (Watts) for the Apple Silicon
-//             SoC domains that ktop surfaces.
+//             SoC domains that SiliconScope surfaces.
 //  Notes:     eCPUWatts/pCPUWatts split efficiency vs performance clusters.
 //             socWatts is a derived sum (true system total needs a HID sensor,
 //             added later). aneWatts is a power-based estimate (Apple exposes no

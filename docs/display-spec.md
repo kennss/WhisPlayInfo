@@ -1,6 +1,6 @@
-# WhisPlayInfo — Display Spec
+# SiliconScope — Display Spec
 
-> What WhisPlayInfo shows and why. Derived from analysis of btop / NeoAsitop / iStat
+> What SiliconScope shows and why. Derived from analysis of btop / NeoAsitop / iStat
 > Menus plus the on-device-AI trend. All in-app labels are English (the names in the
 > tables below are the actual UI labels).
 
@@ -29,7 +29,7 @@ Tracing today's growing workloads makes the differentiator clear:
 
 ## 1. Tool comparison — what each surfaces
 
-| Item | btop | NeoAsitop | iStat Menus | **WhisPlayInfo** |
+| Item | btop | NeoAsitop | iStat Menus | **SiliconScope** |
 |---|---|---|---|---|
 | Per-core CPU | ✓ | ✗ (E/P aggregate only) | ✓ | ✓ |
 | **E/P core split** | ✗ | ✓ | ✓ (freq) | **✓✓ core feature** |
@@ -47,7 +47,7 @@ Tracing today's growing workloads makes the differentiator clear:
 | Alerts | ✗ | ✗ | ✓ | ✓ (memory pressure, bandwidth-bound) |
 
 **Read:** NeoAsitop = strong chip metrics (plain UI) / iStat = broad (weak on AI; no ANE/bandwidth) / btop = strong processes & UX (thin on Apple Silicon).
-→ **WhisPlayInfo = NeoAsitop's chip metrics + iStat's memory-pressure/thermal breadth + btop's process/UX**, plus an AI-workload lens.
+→ **SiliconScope = NeoAsitop's chip metrics + iStat's memory-pressure/thermal breadth + btop's process/UX**, plus an AI-workload lens.
 
 ---
 
@@ -108,5 +108,5 @@ A dedicated, curated panel that answers "why is my AI workload slow?" at a glanc
 - "Likely engine": GPU high / ANE low → `GPU/Metal (LLM-style)`; ANE high → `ANE (CoreML-style)`.
 - Bandwidth near the chip ceiling → a `Bandwidth-bound` warning (LLM token-generation bottleneck).
 
-This interpretation layer — not the raw numbers — is what sets WhisPlayInfo apart from
+This interpretation layer — not the raw numbers — is what sets SiliconScope apart from
 general-purpose monitors.

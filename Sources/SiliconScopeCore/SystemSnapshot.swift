@@ -1,9 +1,9 @@
 //
 //  File:      SystemSnapshot.swift
 //  Created:   2026-06-08
-//  Updated:   2026-06-08
+//  Updated:   2026-06-14
 //  Developer: Kennt Kim / Calida Lab
-//  Overview:  One unified reading of every ktop metric, produced by SystemSampler
+//  Overview:  One unified reading of every SiliconScope metric, produced by SystemSampler
 //             and consumed by the UI. Pure value type (Sendable).
 //  Notes:     likelyAIEngine is a heuristic hint for the AI Workload view: LLMs hit
 //             GPU/Metal + memory bandwidth (ANE idle); CoreML media features hit ANE.

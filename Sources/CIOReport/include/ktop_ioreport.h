@@ -4,7 +4,7 @@
 //  Updated:   2026-06-08
 //  Developer: Kennt Kim / Calida Lab
 //  Overview:  C declarations for Apple's private IOReport framework, exposed to
-//             Swift (KtopCore). There is no SDK stub for IOReport, so symbols are
+//             Swift (SiliconScopeCore). There is no SDK stub for IOReport, so symbols are
 //             resolved at runtime from the dyld shared cache by linking the final
 //             binary with -undefined dynamic_lookup.
 //  Notes:     "Copy"/"Create" funcs return +1 (retained) values; "Get" funcs return

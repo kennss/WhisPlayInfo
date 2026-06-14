@@ -1,7 +1,7 @@
 //
-//  File:      KtopMonitor.swift
+//  File:      SiliconScopeMonitor.swift
 //  Created:   2026-06-08
-//  Updated:   2026-06-08
+//  Updated:   2026-06-14
 //  Developer: Kennt Kim / Calida Lab
 //  Overview:  Observable view-model that drives the UI. Polls SystemSampler on a
 //             background task ~once per second and publishes the latest snapshot plus
@@ -11,11 +11,11 @@
 //
 import Foundation
 import Observation
-import KtopCore
+import SiliconScopeCore
 
 @MainActor
 @Observable
-final class KtopMonitor {
+final class SiliconScopeMonitor {
     /// Rolling time-series for sparklines (last ~60 samples per series).
     struct History {
         var soc: [Double] = []

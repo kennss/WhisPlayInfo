@@ -2,23 +2,23 @@
 //
 //  File:      Package.swift
 //  Created:   2026-06-08
-//  Updated:   2026-06-08
+//  Updated:   2026-06-14
 //  Developer: Kennt Kim / Calida Lab
-//  Overview:  SwiftPM manifest for ktop. Builds CIOReport (private-API C shim),
-//             KtopCore (sudoless data layer, no UI), and ktop-cli (verification).
+//  Overview:  SwiftPM manifest for SiliconScope. Builds CIOReport (private-API C
+//             shim), SiliconScopeCore (sudoless data layer, no UI), sscope-cli
+//             (verification), and the SiliconScope SwiftUI app.
 //  Notes:     IOReport has no SDK stub, so the final binary links with
 //             -undefined dynamic_lookup; symbols resolve at runtime via dyld.
-//             SwiftUI app is added later as a separate Xcode target (see CLAUDE.md).
 //
 import PackageDescription
 
 let package = Package(
-    name: "ktop",
+    name: "SiliconScope",
     platforms: [.macOS(.v14)],
     products: [
-        .library(name: "KtopCore", targets: ["KtopCore"]),
-        .executable(name: "ktop-cli", targets: ["ktop-cli"]),
-        .executable(name: "WhisPlayInfo", targets: ["WhisPlayInfo"]),
+        .library(name: "SiliconScopeCore", targets: ["SiliconScopeCore"]),
+        .executable(name: "sscope-cli", targets: ["sscope-cli"]),
+        .executable(name: "SiliconScope", targets: ["SiliconScope"]),
     ],
     targets: [
         // Private IOReport declarations exposed to Swift.
@@ -26,14 +26,14 @@ let package = Package(
 
         // Sudoless data layer. Must NOT import SwiftUI.
         .target(
-            name: "KtopCore",
+            name: "SiliconScopeCore",
             dependencies: ["CIOReport"]
         ),
 
         // Terminal verification tool for the data layer.
         .executableTarget(
-            name: "ktop-cli",
-            dependencies: ["KtopCore"],
+            name: "sscope-cli",
+            dependencies: ["SiliconScopeCore"],
             linkerSettings: [
                 .unsafeFlags(["-Xlinker", "-undefined", "-Xlinker", "dynamic_lookup"]),
                 .linkedFramework("CoreFoundation"),
@@ -41,10 +41,10 @@ let package = Package(
             ]
         ),
 
-        // SwiftUI app (menu bar + full window). Runs via `xcrun swift run WhisPlayInfo`.
+        // SwiftUI app (menu bar + full window). Runs via `xcrun swift run SiliconScope`.
         .executableTarget(
-            name: "WhisPlayInfo",
-            dependencies: ["KtopCore"],
+            name: "SiliconScope",
+            dependencies: ["SiliconScopeCore"],
             resources: [.process("Resources")],
             linkerSettings: [
                 .unsafeFlags(["-Xlinker", "-undefined", "-Xlinker", "dynamic_lookup"]),

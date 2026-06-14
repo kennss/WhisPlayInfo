@@ -1,25 +1,25 @@
 //
 //  File:      MenuBarView.swift
 //  Created:   2026-06-08
-//  Updated:   2026-06-08
+//  Updated:   2026-06-14
 //  Developer: Kennt Kim / Calida Lab
 //  Overview:  Compact menu-bar popover content: the essentials at a glance (E/P, mem,
 //             GPU, bandwidth, power, die temp) plus Quit.
-//  Notes:     Shares the same KtopMonitor as the full window, so both stay in sync.
+//  Notes:     Shares the same SiliconScopeMonitor as the full window, so both stay in sync.
 //
 import SwiftUI
 import AppKit
-import KtopCore
+import SiliconScopeCore
 
 struct MenuBarView: View {
-    let monitor: KtopMonitor
+    let monitor: SiliconScopeMonitor
     @AppStorage("temperatureFahrenheit") private var fahrenheit = false
     @Environment(\.openSettings) private var openSettings
 
     var body: some View {
         let snapshot = monitor.snapshot
         VStack(alignment: .leading, spacing: 9) {
-            Text("WhisPlayInfo")
+            Text("SiliconScope")
                 .font(.system(size: 13, weight: .bold, design: .monospaced))
                 .foregroundStyle(Theme.accent)
 
@@ -45,7 +45,7 @@ struct MenuBarView: View {
             HStack {
                 Button("Settings…") { openSettings() }
                 Spacer()
-                Button("Quit WhisPlayInfo") { NSApplication.shared.terminate(nil) }
+                Button("Quit SiliconScope") { NSApplication.shared.terminate(nil) }
             }
             .font(.system(size: 12))
         }

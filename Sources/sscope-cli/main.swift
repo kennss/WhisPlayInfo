@@ -1,18 +1,18 @@
 //
 //  File:      main.swift
 //  Created:   2026-06-08
-//  Updated:   2026-06-08
+//  Updated:   2026-06-14
 //  Developer: Kennt Kim / Calida Lab
-//  Overview:  Verification CLI for KtopCore. Prints sudoless power + CPU samples so
-//             we can confirm the data layer works in a real SwiftPM build.
-//  Notes:     Run with `xcrun swift run -q ktop-cli`. Sanity ranges: idle CPU power
+//  Overview:  Verification CLI for SiliconScopeCore. Prints sudoless power + CPU samples
+//             so we can confirm the data layer works in a real SwiftPM build.
+//  Notes:     Run with `xcrun swift run -q sscope-cli`. Sanity ranges: idle CPU power
 //             well under load; P-cores should climb toward max DVFS MHz under load.
 //
 import Foundation
-import KtopCore
+import SiliconScopeCore
 
 guard let power = PowerSampler() else {
-    FileHandle.standardError.write(Data("ktop: failed to subscribe to IOReport (power)\n".utf8))
+    FileHandle.standardError.write(Data("sscope: failed to subscribe to IOReport (power)\n".utf8))
     exit(1)
 }
 let cpu = CPUSampler()
@@ -29,7 +29,7 @@ let thermal = ThermalSampler()
 let bandwidth = BandwidthSampler()
 let temperature = TemperatureSampler()
 
-print("ktop probe — 3 samples (no sudo)")
+print("sscope probe — 3 samples (no sudo)")
 for i in 1...3 {
     let p = power.sample(interval: 0.3)
     let c = cpu?.sample(interval: 0.3) ?? CPUSample()
