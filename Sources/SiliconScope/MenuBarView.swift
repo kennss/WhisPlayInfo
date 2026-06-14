@@ -102,5 +102,9 @@ struct MenuBarView: View {
         if snapshot.temperature.hasBattery {
             KV(key: "Battery", value: formatTemperature(snapshot.temperature.batteryCelsius, fahrenheit: fahrenheit))
         }
+
+        Divider()
+        KV(key: "AI runtime", value: snapshot.aiRuntime.primaryKind?.displayName ?? "none")
+        KV(key: "Fits now", value: snapshot.memoryBudget.fitsNow.first?.label ?? "—")
     }
 }

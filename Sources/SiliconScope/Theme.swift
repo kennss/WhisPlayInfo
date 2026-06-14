@@ -47,6 +47,38 @@ extension Bottleneck {
     }
 }
 
+extension AIRuntimeKind {
+    /// SF Symbol shown beside the runtime name in the cockpit.
+    var symbol: String {
+        switch self {
+        case .ollama:   return "shippingbox.fill"
+        case .llamaCpp: return "terminal.fill"
+        case .lmStudio: return "macwindow"
+        case .mlx:      return "cpu.fill"
+        case .jan, .gpt4all, .vllm: return "brain"
+        }
+    }
+    var color: Color { Theme.accent }
+}
+
+extension MemoryBudget.Risk {
+    /// UI accent: neutral when OK, amber when tight, red while swapping.
+    var color: Color {
+        switch self {
+        case .ok:       return Theme.dim
+        case .tight:    return Theme.heat(0.7)
+        case .swapping: return Theme.heat(1)
+        }
+    }
+    var label: String {
+        switch self {
+        case .ok:       return "OK"
+        case .tight:    return "tight"
+        case .swapping: return "swapping"
+        }
+    }
+}
+
 /// Formats a Celsius value in the user's chosen unit.
 func formatTemperature(_ celsius: Double, fahrenheit: Bool) -> String {
     fahrenheit

@@ -35,6 +35,14 @@ struct DashboardView: View {
                                clockDropFraction: monitor.gpuClockDropFraction)
                     .frame(height: 96)
 
+                AIRuntimeCard(runtime: snapshot.aiRuntime,
+                              budget: snapshot.memoryBudget,
+                              memoryRisk: monitor.memoryRisk,
+                              cpuOffloadLikely: snapshot.aiCPUOffloadLikely,
+                              likelyEngine: snapshot.likelyAIEngine,
+                              gpuSystemPercent: snapshot.gpu.usagePercent)
+                    .frame(height: 88)
+
                 HStack(spacing: 8) {
                     CPUCard(cpu: snapshot.cpu, topology: monitor.topology, history: monitor.history.pCPU)
                     AcceleratorCard(gpu: snapshot.gpu, power: snapshot.power, bandwidth: snapshot.bandwidth,
@@ -189,6 +197,100 @@ private struct AIWorkloadCard: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - AI Runtime cockpit (features ① + ②)
+
+/// Composes runtime detection (①) and the memory budget (②) under the hero. The ③
+/// model/tokens-per-sec lines arrive with the opt-in runtime API.
+private struct AIRuntimeCard: View {
+    let runtime: AIRuntimeSample
+    let budget: MemoryBudget
+    let memoryRisk: MemoryBudget.Risk
+    let cpuOffloadLikely: Bool
+    let likelyEngine: String
+    let gpuSystemPercent: Double
+
+    private static let gb = 1_073_741_824.0
+
+    var body: some View {
+        Card(title: "AI Runtime") {
+            VStack(alignment: .leading, spacing: 7) {
+                header
+                if runtime.isActive { engineLine }
+                budgetLine
+            }
+        }
+    }
+
+    @ViewBuilder private var header: some View {
+        if runtime.isActive, let kind = runtime.primaryKind {
+            HStack(spacing: 8) {
+                Image(systemName: kind.symbol).font(.system(size: 11)).foregroundStyle(kind.color)
+                Text(kind.displayName)
+                    .font(.system(size: 13, weight: .bold, design: .monospaced))
+                    .foregroundStyle(Theme.text)
+                Text(String(format: "RAM %.1f GB · CPU %.0f%%",
+                            Double(runtime.primaryMemoryBytes) / Self.gb, runtime.cpuPercent(of: kind)))
+                    .font(.system(size: 10.5, design: .monospaced)).foregroundStyle(Theme.dim)
+                if let port = runtime.ollamaEmbeddedPort {
+                    Text(":\(port)").font(.system(size: 10.5, design: .monospaced)).foregroundStyle(Theme.faint)
+                }
+                Spacer(minLength: 0)
+            }
+        } else {
+            HStack(spacing: 8) {
+                Image(systemName: "brain").font(.system(size: 11)).foregroundStyle(Theme.faint)
+                Text("No local AI runtime detected")
+                    .font(.system(size: 12, design: .monospaced)).foregroundStyle(Theme.dim)
+                Spacer(minLength: 0)
+            }
+        }
+    }
+
+    // GPU is system-wide (per-process GPU is sudoless-impossible — labelled, never faked).
+    private var engineLine: some View {
+        HStack(spacing: 6) {
+            Text(String(format: "GPU %.0f%% (system)", gpuSystemPercent))
+                .font(.system(size: 10.5, weight: .medium, design: .monospaced))
+                .foregroundStyle(Theme.text)
+            Text("·").font(.system(size: 10.5)).foregroundStyle(Theme.faint)
+            Text(likelyEngine).font(.system(size: 10.5, design: .monospaced)).foregroundStyle(Theme.dim)
+            if cpuOffloadLikely {
+                Text("· likely CPU offload (est.)")
+                    .font(.system(size: 10.5, design: .monospaced)).foregroundStyle(Theme.heat(0.7))
+            }
+            Spacer(minLength: 0)
+        }
+    }
+
+    private var budgetLine: some View {
+        HStack(spacing: 8) {
+            Text("Model budget").font(.system(size: 11, design: .monospaced)).foregroundStyle(Theme.dim)
+            Text(budgetText)
+                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .foregroundStyle(Theme.text)
+                .lineLimit(1).truncationMode(.tail)
+            Spacer(minLength: 0)
+            if memoryRisk != .ok {
+                Text(memoryRisk.label)
+                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                    .foregroundStyle(memoryRisk.color)
+                    .padding(.horizontal, 6).padding(.vertical, 2)
+                    .background(memoryRisk.color.opacity(0.15), in: Capsule())
+            }
+        }
+    }
+
+    private var budgetText: String {
+        let now = budget.fitsNow.first?.label ?? "—"
+        if runtime.isActive,
+           budget.loadableBytes > budget.headroomNowBytes + (1 << 30),
+           let load = budget.fitsLoadable.first?.label {
+            return "free now \(now) · if you unload \(load)"
+        }
+        return "free now \(now)"
     }
 }
 
